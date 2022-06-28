@@ -173,7 +173,7 @@ class MainWindow(customtkinter.CTk):
             sticky="NEWS",
         )
 
-        with open("./README.md", encoding="utf-8") as file:
+        with open("./help.txt", encoding="utf-8") as file:
             message = file.read()
 
         self.widgets["btn_help"] = customtkinter.CTkButton(
