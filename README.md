@@ -7,3 +7,9 @@ This is my CS50P project!
 - You can scroll down the list of selected images, if it so happens you selected a lot of them.
 
 The app has a loading screen and might stay in it for a few seconds while it loads its dependencies. So, be patient!
+
+Python 3.10.
+
+Button icons: https://www.flaticon.com/br/packs/arrow-54.
+Loading Screen: CS50P logo (upscaled).
+App Icon: https://github.com/cs50 profile picture (background removed).
