@@ -2,16 +2,21 @@
 This module implements the app's main window class.
 """
 
-from ctypes import windll
 import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import Callable
 
-# import customtkinter  # type: ignore[import]
+import customtkinter  # type: ignore[import]
+
+# Modes: system (default), light, dark
+customtkinter.set_appearance_mode("dark")
+
+# Themes: blue (default), dark-blue, green
+customtkinter.set_default_color_theme("sweetkind")
 
 
-class MainWindow(tk.Tk):
+class MainWindow(customtkinter.CTk):
     """
     All the app's main functionality should be acessible through this window.
     """
@@ -22,296 +27,199 @@ class MainWindow(tk.Tk):
         functions: dict[str, Callable],
     ):
         super().__init__()
-        self.withdraw()
 
         self.functions: dict[str, Callable] = functions
         self.widgets: dict = {}
-        # self.vars: dict = {}
-        self.settings: dict = {
-            "padx": 2,
-            "pady": 1,
-            "title": "Remove Background",
-            # "font": ("Arial", 12),
-        }
 
-        self.colors: dict[str, str] = {
-            "yellow": "#FCE388",
-            "blue": "#C2CEFF",
-            "red": "#B52C30",
-            "green": "#256A49",
-            "gray": "#525a49",
-            "app_bg_color": "#22223b",
-            "app_bg_light_color": "#4a4e69",
-            "app_fg_color": "#f2e9e4",
-        }
-        self.frames: dict = {}
         self.selected_images: list[str] = []
-        self._click_event = None
 
-        # self.after(50, self._load_window)
-        self._load_window()
+        self._load_app()
 
-    def _load_window(self):
+    def _load_app(self):
         """
         This function will call subfunctions to load the app.
         """
+        # self.withdraw()
+        self.set_scaling(1, 1, 1)
         self._basic_configs()
-        self._place_menu_bar()
         self._place_widgets()
         self._place_window_on_screen()
+        # self.deiconify()
 
     def _basic_configs(self):
         """
         This function should contain all basic configurations such as:
-        - Loading images/files/etc;
-        - Creating variables (StringVar, IntVar, etc);
+            - Loading images/files/etc;
+            - Creating variables (StringVar, IntVar, etc);
+            - Configuring columns and rows;
         """
-        # self._check_and_load_settings()
-
-        self.title(self.settings["title"])
-        # self.minsize(width=800, height=600)
+        self.title("Remove Background")
         self.resizable(width=False, height=False)
-
-        self.config(bg=self.colors["app_bg_color"])
-
-        # self.vars["image_paths"] = tk.StringVar()
-        # self.vars["image_paths"].set("None")
-        self.frames["menu"] = tk.Frame(self, bg="black", relief="raised", bd=0)
-        self.frames["menu"].pack(side=tk.TOP, expand=1, fill=tk.BOTH)
-
-        self.frames["app"] = tk.Frame(
-            self, height=100, bg=self.colors["app_bg_color"], relief="raised", bd=0
-        )
-        self.frames["app"].pack(
-            side=tk.TOP, padx=20, pady=(20, 30), expand=1, fill=tk.BOTH
-        )
 
         self.iconphoto(
             False, self.functions["load_img"]("./images/cs50cat.png", (40, 40))
         )
 
-        # self.grid_rowconfigure(0, weight=1)
-        # self.grid_columnconfigure(1, weight=1)
-        self._overrideredirect(True)
-        # self.lift()
+        self.grid_rowconfigure(0, weight=2, minsize=10)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(4, weight=1)
+        self.grid_rowconfigure(5, weight=1)
+        self.grid_rowconfigure(6, weight=2, minsize=30)
 
-    def _place_menu_bar(self):
+        # self.grid_columnconfigure(0, uniform=10)
+        self.grid_columnconfigure(0, weight=1, minsize=10)
+        self.grid_columnconfigure(1, weight=100)
+        # self.grid_columnconfigure(2, weight=100)
+        self.grid_columnconfigure(5, weight=1, minsize=10)
+
+    def _place_widgets(self):
         """
-        This function should handle the menu bar creation.
+        This function should handle the creating and placing of widgets.
         """
 
-        def turn_label_into_button(label, command=None):
-            label.bind("<Button-1>", lambda e: label.configure(relief="sunken"))
-            label.bind(
-                "<ButtonRelease-1>",
-                lambda e: label.configure(relief="raised"),
-            )
-
-            if command is not None:
-                label.bind(
-                    "<ButtonRelease-1>", lambda e: self.after(100, command), add="+"
-                )
-
-        self.widgets["menu_exit"] = tk.Label(
-            self.frames["menu"],
-            fg=self.colors["app_fg_color"],
-            # fg=self.colors["app_bg_light_color"],
-            bg="gray",
-            relief="raised",
-            text="✖",  # Change folder
-            width=3,
-            height=1,
+        self.widgets["lbl_selected_images"] = customtkinter.CTkLabel(
+            self,
+            text="Images to process:",
+            anchor="sw",
         )
-        self.widgets["menu_exit"].pack(side=tk.RIGHT)
-        turn_label_into_button(self.widgets["menu_exit"], self.destroy)
-
-        self.widgets["menu_help"] = tk.Label(
-            self.frames["menu"],
-            fg=self.colors["app_fg_color"],
-            bg="gray",
-            relief="raised",
-            text="Help",  # Change folder
-            width=5,
-            height=1,
+        self.widgets["lbl_selected_images"].grid(
+            row=1,
+            column=1,
+            pady=0,
+            padx=0,
+            ipady=0,
+            sticky="w",
         )
-        self.widgets["menu_help"].pack(side=tk.LEFT)
+
+        self.widgets["lbx_image_paths"] = tk.Listbox(
+            self,
+            width=40,
+            bg="#4a4e69",
+            highlightthickness=0,
+            relief="flat",
+            bd=3,
+            # selectmode=tk.MULTIPLE,
+        )
+        self.widgets["lbx_image_paths"].insert(0, "Empty")
+        self.widgets["lbx_image_paths"].grid(
+            row=2,
+            column=1,
+            columnspan=2,
+            rowspan=4,
+            pady=(1, 1),
+            padx=(20, 0),
+            sticky="NEWS",
+        )
+
+        self.widgets["btn_add"] = customtkinter.CTkButton(
+            self,
+            corner_radius=13,
+            text="  Add          ",
+            image=self.functions["load_img"]("images/add_white.png", (60, 60)),
+            compound="left",
+            command=self.add_images_button_press,
+        )
+        self.widgets["btn_add"].grid(
+            row=2,
+            column=4,
+            pady=(0, 5),
+            padx=(8, 15),
+            sticky="NEWS",
+        )
+
+        self.widgets["btn_remove"] = customtkinter.CTkButton(
+            self,
+            corner_radius=13,
+            text="  Remove    ",
+            image=self.functions["load_img"]("images/minus_white.png", (60, 60)),
+            command=self.remove_image_from_list_button_press,
+        )
+        self.widgets["btn_remove"].grid(
+            row=3,
+            column=4,
+            pady=5,
+            padx=(8, 15),
+            sticky="NEWS",
+        )
+        self.widgets["btn_clear"] = customtkinter.CTkButton(
+            self,
+            text="  Clear         ",
+            corner_radius=13,
+            image=self.functions["load_img"]("images/cross_white.png", (60, 60)),
+            command=self.clear_listbox_button_press,
+        )
+        self.widgets["btn_clear"].grid(
+            row=4,
+            column=4,
+            pady=5,
+            padx=(8, 15),
+            sticky="NEWS",
+        )
+
+        self.widgets["btn_apply"] = customtkinter.CTkButton(
+            self,
+            text="  Apply         ",
+            corner_radius=13,
+            image=self.functions["load_img"]("images/check_white.png", (60, 60)),
+            command=self.apply_button_press,
+        )
+        self.widgets["btn_apply"].grid(
+            row=5,
+            column=4,
+            # rowspan=1,
+            pady=(5, 0),
+            padx=(8, 15),
+            sticky="NEWS",
+        )
 
         with open("./README.md", encoding="utf-8") as file:
             message = file.read()
-        turn_label_into_button(
-            self.widgets["menu_help"],
-            lambda: messagebox.showinfo(
+
+        self.widgets["btn_help"] = customtkinter.CTkButton(
+            master=self,
+            image=self.functions["load_img"]("images/help_crop.png", 0.09),
+            text="",
+            width=28,
+            border_width=0,
+            corner_radius=1000,
+            fg_color=None,
+            hover_color="#212435",
+            command=lambda: messagebox.showinfo(
                 title="Help",
                 message=message,
                 icon="question",
             ),
         )
-
-        self.widgets["menu_title"] = tk.Label(
-            self.frames["menu"],
-            fg=self.colors["app_fg_color"],
-            bg="black",
-            # relief="raised",
-            text=self.settings["title"],  # Change folder
-            # width=5,
-            justify="left",
-            # height=1,
-        )
-        self.widgets["menu_title"].pack(side=tk.LEFT, expand=1, fill=tk.X)
-
-        self.widgets["menu_title"].bind(
-            "<B1-Motion>",
-            lambda event: self.geometry(
-                f"+{event.x_root - self._click_event.x -58}+{event.y_root - self._click_event.y}"
-            ),
-        )
-
-        def click_event_fun(event):
-            self._click_event = event
-
-        self.widgets["menu_title"].bind("<Button-1>", click_event_fun)
-
-    def _place_widgets(self):
-        """
-        This function should handle the non-menubar widgets.
-        """
-
-        self.widgets["lbl_selected_images"] = tk.Label(
-            self.frames["app"],
-            text="Images to process:",
-            # Set "bg" to "self.colors["app_bg_color"]" once all widgets are placed.
-            # bg="#9a8c98",
-            bg=self.colors["app_bg_color"],
-            fg=self.colors["app_fg_color"],
-            # width=30,
-            anchor="w",
-            # justify="left",
-        )
-        self.widgets["lbl_selected_images"].grid(
+        self.widgets["btn_help"].grid(
             row=0,
-            column=0,
-            columnspan=2,
-            padx=self.settings["padx"],
-            pady=0,
-            sticky="NEWS",
-        )
-
-        self.widgets["lbx_image_paths"] = tk.Listbox(
-            self.frames["app"],
-            # textvariable=self.vars["image_paths"],
-            # Set "bg" to "self.colors["app_bg_color"]" once all widgets are placed.
-            # bg="blue",  # self.colors["app_bg_color"],
-            width=30,
-            fg=self.colors["app_fg_color"],
-            bg=self.colors["app_bg_light_color"],
-            # selectmode=tk.MULTIPLE,
-            highlightthickness=0,
-            relief=tk.FLAT,
-            height=5,
-            bd=3,
-            # anchor="nw",
-            justify="left",
-        )
-        self.widgets["lbx_image_paths"].insert(0, "Empty")
-        self.widgets["lbx_image_paths"].grid(
-            row=1,
-            column=0,
-            rowspan=5,
-            padx=self.settings["padx"],
-            pady=(0, self.settings["pady"]),
-            sticky="NEWS",
-        )
-
-        self.widgets["btn_add"] = tk.Button(
-            self.frames["app"],
-            fg=self.colors["app_fg_color"],
-            bg=self.colors["app_bg_light_color"],
-            text="Add",  # Change folder
-            width=8,
-            command=self.add_images_button_press,
-        )
-        self.widgets["btn_add"].grid(
-            row=1,
-            column=1,
-            # rowspan=2,
-            padx=self.settings["padx"],
-            pady=(self.settings["pady"], 0),
-            sticky="NEWS",
-        )
-
-        self.widgets["btn_remove"] = tk.Button(
-            self.frames["app"],
-            fg=self.colors["app_fg_color"],
-            bg=self.colors["app_bg_light_color"],
-            # Remove background (all subfolders)
-            text="Remove",
-            width=8,
-            # height=1,
-            command=self.remove_image_from_list_button_press,
-        )
-        self.widgets["btn_remove"].grid(
-            row=3,
-            column=1,
-            # rowspan=1,
-            padx=self.settings["padx"],
-            pady=0,  # self.settings["pady"],
-            sticky="NEWS",
-        )
-        self.widgets["btn_clear"] = tk.Button(
-            self.frames["app"],
-            # Remove background (all subfolders)
-            text="Clear",
-            width=8,
-            fg=self.colors["app_fg_color"],
-            bg=self.colors["app_bg_light_color"],
-            # height=1,
-            command=self.clear_listbox_button_press,
-        )
-        self.widgets["btn_clear"].grid(
-            row=4,
-            column=1,
-            # rowspan=1,
-            padx=self.settings["padx"],
-            pady=0,  # self.settings["pady"],
-            sticky="NEWS",
-        )
-
-        self.widgets["btn_rembg"] = tk.Button(
-            self.frames["app"],
-            # Remove background (all subfolders)
-            text="Apply",
-            width=8,
-            fg=self.colors["app_fg_color"],
-            bg=self.colors["app_bg_light_color"],
-            # height=1,
-            command=self.rembg_button_press,
-        )
-        self.widgets["btn_rembg"].grid(
-            row=5,
-            column=1,
-            # rowspan=1,
-            padx=self.settings["padx"],
-            pady=0,  # self.settings["pady"],
-            sticky="NEWS",
+            rowspan=2,
+            column=4,
+            columnspan=1,
+            padx=(0, 15),
+            pady=10,
+            sticky="se",
         )
 
     def _place_window_on_screen(self):
-        self.update()
-        width = self.winfo_reqwidth()
-        height = self.winfo_reqheight()
-        offset = {
-            "x": int(0.5 * self.winfo_screenwidth() - width // 2),
-            "y": int(0.5 * self.winfo_screenheight() - height // 2 - 20),
-        }
-        # print(self.winfo_screenwidth(), self.winfo_width())
-        # print(self.winfo_screenheight(), self.winfo_height())
-        # print(offset, self.geometry())
-        self.geometry(f"{width}x{height}+{offset['x']}+{offset['y']}")
+        # self.update()
+        # self.withdraw()
+        # width = self.winfo_reqwidth()
+        # height = self.winfo_reqheight()
+        # offset = {
+        #     "x": int(0.5 * self.winfo_screenwidth() - width // 2),
+        #     "y": int(0.5 * self.winfo_screenheight() - height // 2 - 20),
+        # }
+        # print(width, height, offset)
 
-    def rembg_button_press(
+        # self.geometry(f"{width}x{height}+{offset['x']}+{offset['y']}")
+        self.geometry(f"{698}x{434}+{611}+{303}")
+
+    def apply_button_press(
         self,
-        model_path: str = "./models/u2net_human_seg.pth",
+        # model_name: str = "u2net_human_seg.pth",
         alpha_matting: bool = False,
+        file_id_to_dowload_model_from: str = "1-Yg0cxgrNhHP-016FPdp902BR-kSsA4P",
     ) -> None:
         """
         Implementation of the background removing button.
@@ -324,18 +232,36 @@ class MainWindow(tk.Tk):
         if not self.selected_images:
             messagebox.showinfo(
                 title="Wait... wut?",
-                message="No images were selected. Select at least one before pressing this button.",
+                message="No images were added. Add at least one before pressing this button.",
                 parent=self,
             )
             return
+
+        if not self.functions["model_exists"]():
+            should_download = messagebox.askyesno(
+                title="Model is not present in the expected folder.",
+                message="Model for removing background not found, should it be downloaded?"
+                + " You can't remove background without it.",
+                parent=self,
+            )
+            if should_download:
+                self.functions["download_model"](
+                    # model_name=model_name,
+                    file_id_to_dowload_model_from=file_id_to_dowload_model_from,
+                    parent_window=self,
+                )
+            else:
+                return
+
+        # model_name: str = "u2net_human_seg",
         threads: list = []
         for pos, image_path in enumerate(self.selected_images):
             threads.append(
                 threading.Thread(
-                    target=rm_bg,
+                    target=self.functions["rm_bg"],
                     args=(
                         image_path,
-                        model_path,
+                        # model_name,
                         alpha_matting,
                     ),
                 )
@@ -354,9 +280,7 @@ class MainWindow(tk.Tk):
             thread.join()
 
         messagebox.showinfo(
-            # Finished
             title="Done!",
-            # Backgrounds removed successfully!
             message="All background were successfully removed!",
             parent=self,
             # This specific icon removes the bell noise from the messagebox.
@@ -371,13 +295,12 @@ class MainWindow(tk.Tk):
         """
         selected_images = filedialog.askopenfilenames(
             # initialdir=r"/",
-            # Select JPG images to remove background
             title="Select images to remove background.",
             filetypes=(
-                ("Images", "*.jpg"),  # Images
-                ("Images", "*.jpeg"),  # Images
-                ("Images", "*.png"),  # Images
-                ("All files", "*.*"),  # All files.
+                ("Images", "*.jpg"),
+                ("Images", "*.jpeg"),
+                ("Images", "*.png"),
+                ("All files", "*.*"),
             ),
         )
         if not selected_images:
@@ -455,37 +378,16 @@ class MainWindow(tk.Tk):
         self.widgets["lbx_image_paths"].insert(0, "Empty")
         self.selected_images.clear()
 
-    def _overrideredirect(self, boolean=None):
-        """
-        Stackoverflow solution to make it so overrideredirect doesn't stop the app from showing
-        when the user alt+tab or wants to click on it from the taskbar.
-        https://stackoverflow.com/questions/63217105/tkinter-overridedirect-minimizing-and-windows-task-bar-issues
-        """
-        self.overrideredirect(boolean)
-        gwl_exstyle = -20
-        ws_ex_appwindow = 0x00040000
-        ws_ex_toolwindow = 0x00000080
-        if boolean:
-            hwnd = windll.user32.GetParent(self.winfo_id())
-            style = windll.user32.GetWindowLongW(hwnd, gwl_exstyle)
-            style = style & ~ws_ex_toolwindow
-            style = style | ws_ex_appwindow
-            windll.user32.SetWindowLongW(hwnd, gwl_exstyle, style)
-
 
 def main() -> int:
     """
     This function exists for easily testing this module "directly". This will skip  the loading
-    screen.
+    screen. Background removing won't work if this is executed.
     """
-    from project import load_img, rm_bg
+    # pylint: disable=import-error, import-outside-toplevel, cyclic-import
+    from project import functions
 
-    functions: dict[str, Callable] = {
-        "load_img": load_img,
-        "rm_bg": rm_bg,
-    }
     root = MainWindow(functions=functions)
-    root.deiconify()
     root.mainloop()
     return 0
 
