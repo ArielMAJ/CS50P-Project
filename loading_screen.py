@@ -50,8 +50,11 @@ class LoadingScreen(Tk):
 
         self.overrideredirect(True)
         # self.attributes("-topmost", True)
+
+        # The two following options don't seem to work on Ubuntu
         self.attributes("-disabled", True)
         self.attributes("-transparentcolor", "#010101")
+
         self.attributes("-alpha", 0.8)
 
         self.lift()

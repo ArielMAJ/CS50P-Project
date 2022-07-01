@@ -1,9 +1,11 @@
-# This is my CS50P project!
+# Remove Background with an offline GUI
 
-This project is a Graphical User Interface for helping making it easier to remove image background offline.
-You can add as many jpg, jpeg and png images as you wish and remove their background all at once. Images will
-be processed in parallel and the resulting image will be saved alongside the original one with "\_NO\_BG" at
-the end of its name.
+This is my CS50P project!
+
+#### Video Demo: <OMITTED>
+
+#### Description: This project is a Graphical User Interface for helping making it easier to remove image background offline. You can add as many JPG, JPEG and PNG images as you wish and remove their background all at once. Images will be processed in parallel and the resulting images will be saved alongside the original one with "\_NO\_BG" at the end of its name. This uses U2NET for human segmentation and works best with images of people (might not work well with other things). This was developed on Windows 11 and doesn't work on linux as it is.
+
 
 ## project.py
 
@@ -28,15 +30,17 @@ This file also have some minor functions for checking/processing file paths as t
 
 Implements the loading screen class. It can be directly executed for testing if it's working. This will receive a list of threads to wait for. It uses a CS50P image.
 
+Importing the rembg module (and a few other modules that use AI which I considered adding) can take quite a few seconds, probably more on weaker computers. So, having a loading screen and importing those modules in parallel was something that made sense. Without a loading screen, the user would stare at they terminal waiting for the main screen to pop up. It would be even worse if the user just double clicks a shortcut that starts the app: it would be unclear whether the shortcut have been executed or not. The loading screen makes it clear the app is starting and loading its dependencies.
+
 ## main_window.py
 
-Implements the main window class. Theis defines all the GUI widgets, placing and what each does. It uses customtkinter module in attempt to have a more modern feel and some icons from flaticon.com.
+Implements the main window class. This defines all the GUI widgets, placing and what each does. It uses customtkinter module in attempt to have a more modern feel and some icons from "flaticon.com". This is the screen in which the user will interact with the app.
 
 ## test_project.py
 
 Implements the required test functions and more. Uses parametrized tests to facilitate testing many different situations.
 
-# Evolution of the project.
+## Evolution of the project.
 
 I started with only tkinter and simple colors, then I tried a few color palletes. Thanks to some tips from active people on CS50 discord I got to learn about customtkinter and managed to get a more windows10/11 feel to the app.
 
@@ -45,13 +49,15 @@ I started with only tkinter and simple colors, then I tried a few color palletes
 I also had a few more plans of things to add to the app, but getting to where what it is right now took way more time, work and effort than expected. Just placing the widgets and making the screen pretty already creates a rabbit hole of a lot of small little things to work out. Adding the other functionalities I had in mind would take much more time and would probably require a second person (which I couldn't easily find) to finish it (and I don't really have all that time to keep working on this). Something I was really interested in adding was upscaling images with a "WAIFU2X" python module. I managed to get the basics working, but changes to the GUI would be too much to do right now.
 
 
-# Thanks!
+## Thanks!
 
-This project uses Python 3.10, everything in "requeriments.txt" and their dependencies.
+This course was 10/10!
+
+This project uses Python 3.10, everything in "requeriments.txt" and their dependencies. Styling follows black and pylint as much as possible.
 
 Button icons: https://www.flaticon.com/br/packs/arrow-54.
 Loading Screen: CS50P logo (upscaled).
-App Icon: https://github.com/cs50 profile picture (background removed).
+App Icon: https://github.com/cs50 profile picture (background removed - uses a more general object segmentation neural network).
 
 MIT License.
 

@@ -10,7 +10,9 @@ import os
 import threading
 from tkinter import messagebox
 from typing import Union, Callable
-from ctypes import windll
+
+# If you use windows uncomment this:
+# from ctypes import windll
 
 import requests  # type: ignore[import]
 from PIL import Image, ImageTk  # type: ignore[import]
@@ -30,7 +32,8 @@ def importer():
     from rembg import bg  # type: ignore[import]
 
 
-windll.shcore.SetProcessDpiAwareness(1)
+# If you use windows uncomment this:
+# windll.shcore.SetProcessDpiAwareness(1)
 
 
 def main() -> int:
