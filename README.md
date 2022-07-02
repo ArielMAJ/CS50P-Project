@@ -2,7 +2,7 @@
 
 This is my CS50P project!
 
-#### Video Demo: <OMITTED>
+#### Video Demo: \<OMITTED\>
 
 #### Description: This project is a Graphical User Interface for helping making it easier to remove image background offline. You can add as many JPG, JPEG and PNG images as you wish and remove their background all at once. Images will be processed in parallel and the resulting images will be saved alongside the original one with "\_NO\_BG" at the end of its name. This uses U2NET for human segmentation and works best with images of people (might not work well with other things). This was developed on Windows 11 and doesn't work on linux as it is.
 
@@ -55,8 +55,8 @@ This course was 10/10!
 
 This project uses Python 3.10, everything in "requeriments.txt" and their dependencies. Styling follows black and pylint as much as possible.
 
-Button icons: https://www.flaticon.com/br/packs/arrow-54.
-Loading Screen: CS50P logo (upscaled).
+Button icons: https://www.flaticon.com/br/packs/arrow-54.<br>
+Loading Screen: CS50P logo (upscaled).<br>
 App Icon: https://github.com/cs50 profile picture (background removed - uses a more general object segmentation neural network).
 
 MIT License.
