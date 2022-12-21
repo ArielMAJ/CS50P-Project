@@ -19,7 +19,7 @@ class LoadingScreen(Tk):
         *,
         seconds: float = 0.5,
         load_img: Callable[[str, Union[tuple[int, int], float]], ImageTk.PhotoImage],
-        wait_for: list = None,
+        wait_for: list | None = None,
     ):
         super().__init__()
         # self.parent = parent
