@@ -4,7 +4,6 @@ Display loading screen -> Load app in the "background" -> Destroy loading screen
 screen.
 """
 
-
 import io
 import os
 import threading
@@ -54,7 +53,7 @@ def main() -> int:
 
 
 def load_img(
-    image_path: str, size: Union[tuple[int, int], float | int] = None
+    image_path: str, size: Union[tuple[int, int], float | int | None] = None
 ) -> ImageTk.PhotoImage:
     """
     This should load images.
@@ -102,7 +101,8 @@ def rm_bg(
     This function will remove the background of a given image. It should receive a JPG image path.
     It will create and save a JPG image with white background.
     """
-
+    input_img_path: str
+    output_img_path: str
     input_img_path, output_img_path = process_img_path(image_path)
 
     # Opening/reading image as bytes.
@@ -121,7 +121,7 @@ def rm_bg(
 
     # Tuple representing the new RGB background color (the image we get from rembg is a transparent
     # PNG).
-    fill_color = (255, 255, 255)
+    fill_color: tuple[int, int, int] = (255, 255, 255)
     pil_img = pil_img.convert("RGBA")
     if pil_img.mode in ("RGBA", "LA"):
         # Removing transparency and making background white.
@@ -141,7 +141,7 @@ def check_image_type(image_path: str) -> tuple[int, str]:
         - Raises a value error if the image type isn't in the accepted image
         types list.
     """
-    accepted_image_types = ["jpg", "jpeg", "png"]
+    accepted_image_types: tuple[str, str, str] = ("jpg", "jpeg", "png")
     if (
         not isinstance(image_path, str)
         or (dot_pos := image_path.rfind(".")) == -1
@@ -158,11 +158,13 @@ def process_img_path(image_path: str) -> tuple[str, str]:
     Outputs the processed input image path and output path (to save final image).
     """
     # Making sure we got the correct input.
+    dot_pos: int
+    file_type: str
     dot_pos, file_type = check_image_type(image_path)
 
     # Replacing "\" to "/" because *Windows*.
-    input_img_path = image_path.replace("\\", "/")
-    output_img_path = input_img_path[:dot_pos] + "_NO_BG." + file_type
+    input_img_path: str = image_path.replace("\\", "/")
+    output_img_path: str = input_img_path[:dot_pos] + "_NO_BG." + file_type
 
     return (input_img_path, output_img_path)
 
@@ -205,20 +207,20 @@ def download_model(
         Expects a (google drive) file ID and a destination to save it.
         Reference: https://stackoverflow.com/a/39225039
         """
-        url = "https://docs.google.com/uc?export=download"
+        url: str = "https://docs.google.com/uc?export=download"
 
         session = requests.Session()
         response = session.get(url, params={"id": file_id}, stream=True)
         response = session.get(url, params={"id": file_id, "confirm": "t"}, stream=True)
 
-        chunk_size = 32768
+        chunk_size: int = 32768
         with open(destination, "wb") as file:
             for chunk in response.iter_content(chunk_size):
                 if chunk:  # filters out keep-alive new chunks
                     file.write(chunk)
 
     if model_exists(model_path):
-        message = "Model has already been downloaded."
+        message: str = "Model has already been downloaded."
         if parent_window is not None:
             messagebox.showinfo(
                 parent=parent_window,
@@ -230,8 +232,8 @@ def download_model(
         return
 
     model_path = model_path.replace("\\", "/")
-    pos = model_path.rfind("/")
-    folder_path = model_path[:pos]
+    pos: int = model_path.rfind("/")
+    folder_path: str = model_path[:pos]
 
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
