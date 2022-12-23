@@ -63,7 +63,7 @@ def load_img(
         None, to keep original size.
     """
 
-    # Reusing checks
+    # Reusing checks.
     check_image_type(image_path)
 
     if size is None:
